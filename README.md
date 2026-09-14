@@ -12,26 +12,6 @@ This project implements an end-to-end Medallion Architecture (Bronze, Silver, Go
 
 ## Architecture Overview
 
-
-### 1. Bronze Layer (Raw Ingestion)
-* **Objective:** Extract raw, unstructured, and semi-structured data from the Azure landing zone and persist it as Delta tables.
-* **Sources:** 
-  * Clinic Claims (CSV)
-  * Hospital Claims (Parquet)
-  * EDI-837 Claims (Nested JSON)
-* **Script:** `01_ingest_bronze.py`
-
-### 2. Silver Layer (Harmonization & Deduplication)
-* **Objective:** Cleanse, flatten, and unify the disparate data sources into a single, query-ready table.
-* **Transformations:**
-  * Flattens deeply nested JSON structures using dot-notation.
-  * Standardizes column names (e.g., `hospital_claim_id` and `claim_id` mapped to `unified_claim_id`).
-  * Enforces data type casting (String to DateType/DoubleType).
-  * Executes idempotent Upserts (`MERGE`) to prevent duplicate records on pipeline reruns.
-* **Script:** `02_transform_silver.py`
-
-## Architecture diagram
-
 ```mermaid
 flowchart LR
     subgraph ADLS [Azure Data Lake Storage]
@@ -91,6 +71,24 @@ flowchart LR
     style BC fill:#efebe9,stroke:#5d4037
     style BH fill:#efebe9,stroke:#5d4037
     style BE fill:#efebe9,stroke:#5d4037
+    
+'''
+### 1. Bronze Layer (Raw Ingestion)
+* **Objective:** Extract raw, unstructured, and semi-structured data from the Azure landing zone and persist it as Delta tables.
+* **Sources:** 
+  * Clinic Claims (CSV)
+  * Hospital Claims (Parquet)
+  * EDI-837 Claims (Nested JSON)
+* **Script:** `01_ingest_bronze.py`
+
+### 2. Silver Layer (Harmonization & Deduplication)
+* **Objective:** Cleanse, flatten, and unify the disparate data sources into a single, query-ready table.
+* **Transformations:**
+  * Flattens deeply nested JSON structures using dot-notation.
+  * Standardizes column names (e.g., `hospital_claim_id` and `claim_id` mapped to `unified_claim_id`).
+  * Enforces data type casting (String to DateType/DoubleType).
+  * Executes idempotent Upserts (`MERGE`) to prevent duplicate records on pipeline reruns.
+* **Script:** `02_transform_silver.py`
 
 ### 3. Gold Layer (Business Aggregations)
 * **Objective:** Generate analytics-ready dimensional and fact tables for downstream BI consumption.
